@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__) # Gives a unique name
 stores = [
@@ -47,7 +47,7 @@ def create_item_in_store(name):
     request_data = request.get_json()
     store = list(filter(lambda store: store['name'] == name, stores))
     new_item = {'name': request_data['name'], 'price': request_data['price']}
-    if store == []
+    if store == []:
         return jsonify({'message': 'store not found'})
 
     store[0]['items'].append(new_item)
