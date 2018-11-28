@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, Container, Form, Input, TextArea } from "semantic-ui-react";
+import { Button, Card, Form, Input, TextArea } from "semantic-ui-react";
 
 
 class Formulario extends Component {
@@ -21,7 +21,7 @@ class Formulario extends Component {
 
 	render() {
 		return (
-			<Card>
+			<Card color="purple" style={{"padding": "2%"}}>
 				<Form onSubmit={this.agregar}>
   				<Form.Field        			
           			control={Input}

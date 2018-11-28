@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table } from 'semantic-ui-react'
+import { Button, Table } from 'semantic-ui-react'
 
 class Tabla extends Component {
 	render() {
@@ -8,22 +8,24 @@ class Tabla extends Component {
 
     datosCarrera.forEach( (element) => {
       filas.push(
-      <Table.Row>
-        <Table.Cell>
-          {element[0]}
-        </Table.Cell>
+      <Table.Row key={element[0]}>
+        <Table.Cell>{element[0]}</Table.Cell>
+
         <Table.Cell>{element[1]}</Table.Cell>
-        <Table.Cell textAlign='right'>
-          {element[2]}
+        
+        <Table.Cell textAlign='right'>{element[2]}</Table.Cell>
+        <Table.Cell collapsing textAlign='center'>
+          <Button basic color="red" onClick={() => this.props.actionEliminar(element[0])}>Eliminar</Button>
         </Table.Cell>
       </Table.Row>
       );
     });
+
 		return (
-			<Table celled striped>
+			<Table celled striped color="red">
 				<Table.Header>
 			      <Table.Row>
-			        <Table.HeaderCell colSpan='3'>Carreras</Table.HeaderCell>
+			        <Table.HeaderCell colSpan='4'>Carreras</Table.HeaderCell>
 			      </Table.Row>
 			    </Table.Header>
 
