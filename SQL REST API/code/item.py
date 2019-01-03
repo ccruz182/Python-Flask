@@ -26,13 +26,8 @@ class Item(Resource):
 		if row:
 			return {"item": {'name': row[0], 'price': row[1]}}
 
-	def post(self, name):
-		if Item.find_by_name(name):
-			return {'message': 'Item already exists'}, 400 
-
-		data = request.get_json()
-		item = {'name': name, 'price': data['price']}
-		
+	@classmethod
+	def insert(cls, item):
 		# Write to db
 		connection = sqlite3.connect('data.db')
 		cursor = connection.cursor()
@@ -43,31 +38,83 @@ class Item(Resource):
 		connection.commit()
 		connection.close()
 
+
+	def post(self, name):
+		if Item.find_by_name(name):
+			return {'message': 'Item already exists'}, 400 
+
+		data = request.get_json()
+		item = {'name': name, 'price': data['price']}
+		
+		try:
+			self.insert(item)
+		except:
+			return {"message": "An error occured inserting the item"}, 500 # Internal server error
+
 		return item, 201
 
 	def delete(self, name):
-		global items
-		items = list(filter(lambda x: x['name'] != name, items))
+		connection = sqlite3.connect('data.db')
+		cursor = connection.cursor()
+
+		query = "DELETE FROM items WHERE name=?"
+		cursor.execute(query, (name,))
+
+		connection.commit()
+		connection.close()
+
 		return {'message': 'Item deleted'}
 
 	def put(self, name):
 		parser = reqparse.RequestParser()
 		parser.add_argument('price', type=float, required=True, help="This field can not be left blank!")
-		
-		item = filter(lambda item: item['name'] == name, items)
-		
+				
 		data = parser.parse_args()
-		# data = request.get_json()
-		
-		if item == []:
-			itemC = {'name': name, 'price': data['price']}
-			items.append(itemC)			
-		else:
-			item[0].update(data)
 
-		return item
+		item = self.find_by_name(name)
+		updated_item = {'name': name, 'price': data['price']}
+
+				
+		if item is None:
+			try:
+				self.insert(updated_item)
+				return updated_item	
+			except:
+				return {"message": "An error occured inserting the item"}, 500
+		else:
+			try:
+				self.update(updated_item)
+				return updated_item	
+			except:	
+				return {"message": "An error occured updating the item"}, 500
+
+	@classmethod
+	def update(cls, item):
+		connection = sqlite3.connect('data.db')
+		cursor = connection.cursor()
+
+		query = "UPDATE items SET price=? WHERE name=?"
+		cursor.execute(query, (item['price'], item['name']))
+
+		connection.commit()
+		connection.close()
+
+		return {'message': 'Item updated'}
 
 
 class Items(Resource):
 	def get(self):
+		connection = sqlite3.connect('data.db')
+		cursor = connection.cursor()
+
+		query = "SELECT * FROM items"
+		result = cursor.execute(query)
+		items = []
+
+		for row in result:
+			items.append({"name": row[0], "price": row[1]})
+
+		connection.commit()
+		connection.close()
+
 		return {'items': items}
