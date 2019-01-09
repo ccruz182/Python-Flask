@@ -12,3 +12,8 @@ print "*** ITEMS *** "
 select_query = "SELECT * FROM items"
 for row in cursor.execute(select_query):
 	print(row)
+
+print "*** STORES *** "
+select_query = "SELECT * FROM store"
+for row in cursor.execute(select_query):
+	print(row)
